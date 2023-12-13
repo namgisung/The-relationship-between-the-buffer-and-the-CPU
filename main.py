@@ -30,7 +30,7 @@ max_blocks = 140
 extra_block_size = 30
 
 # 딜레이 시간 설정
-delay_time = 0.2
+delay_time = 0.05   
 
 # 마지막으로 실행한 시간
 last_execution_time = time.time()
@@ -57,6 +57,7 @@ class DirectionStack:
     
     def pop_(self):
         if not self.is_empty():
+            remove_first_block()
             return self.stack.pop(0)  # 스택의 맨 앞에서 팝
         else:
             print("스택이 비어있습니다.")
@@ -102,6 +103,11 @@ def remove_last_block():
     global blocks
     if blocks:
         blocks.pop()
+
+def remove_first_block():
+    global blocks
+    if blocks:
+        blocks.pop(0)
 
 def initialize_extra_blocks():
     global extra_blocks
@@ -208,7 +214,7 @@ def draw_stone(stone_position):
 
     
 
-direction_stack = DirectionStack()
+
 current_direction = None
 last_move_time = time.time()
 
@@ -267,8 +273,15 @@ stone_rect = stone_image.get_rect()
 clock = pygame.time.Clock()
 frame_rate = 10  # 초당 프레임 수 설정
 
+execute_moves = False
+move_interval = 0.05
+time_since_last_move =0
 
 while True:
+    dt = clock.tick(60) / 1000.0
+    time_since_last_move += dt
+
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -279,17 +292,19 @@ while True:
             if event.key == pygame.K_LEFT:
                 direction_stack.push('LEFT')
                 create_block("blocks/left.png")
+                print(len(blocks))
             elif event.key == pygame.K_RIGHT:
-                direction_stack.push('RIGHT')
-                new_position = (o_position_array[0] + 1, o_position_array[1])
+                direction_stack.push('RIGHT')    
                 create_block("blocks/right.png")
+                print(len(blocks))
             elif event.key == pygame.K_UP:
                 direction_stack.push('UP')
                 create_block("blocks/up.png")
+                print(len(blocks))
             elif event.key == pygame.K_DOWN:
                 direction_stack.push('DOWN')
                 create_block("blocks/down.png")
-                    
+                print(len(blocks))
             elif event.key == pygame.K_BACKSPACE:
                 remove_last_block_with_direction()
                 print(len(blocks))
@@ -297,13 +312,24 @@ while True:
                 pygame.quit()
                 sys.exit()
             elif event.key == pygame.K_RETURN:
-                while not direction_stack.is_empty():
-                    current_direction = direction_stack.pop_()
-                    print(f"Executing direction: {current_direction}")
-                    o_position_array, stone_position_array = move_player_and_stone(o_position_array, stone_position_array, current_direction)
-                    pygame.display.flip()
-                    time.sleep(delay_time)
-                print("Stack is empty.")
+                execute_moves = True
+                
+        if direction_stack.is_empty() and execute_moves:
+            execute_moves = False
+            print("A")
+
+        if execute_moves  and time_since_last_move >= delay_time:
+            if not direction_stack.is_empty():
+                current_direction = direction_stack.pop_()
+                print(f"Executing direction: {current_direction}")
+                o_position_array, stone_position_array = move_player_and_stone(o_position_array, stone_position_array, current_direction)
+                pygame.display.flip()
+                time_since_last_move = 0
+            
+
+        time_since_last_move = 0  # 이동 후 시간 초기화
+            
+        
     
     
 
