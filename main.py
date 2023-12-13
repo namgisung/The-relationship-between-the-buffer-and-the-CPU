@@ -318,17 +318,13 @@ while True:
             execute_moves = False
             print("A")
 
-        if execute_moves  and time_since_last_move >= delay_time:
-            if not direction_stack.is_empty():
-                current_direction = direction_stack.pop_()
-                print(f"Executing direction: {current_direction}")
-                o_position_array, stone_position_array = move_player_and_stone(o_position_array, stone_position_array, current_direction)
-                pygame.display.flip()
-                time_since_last_move = 0
-            
-
-        time_since_last_move = 0  # 이동 후 시간 초기화
-            
+    if execute_moves and time_since_last_move >= delay_time:
+        if not direction_stack.is_empty():
+            current_direction = direction_stack.pop_()
+            print(f"Executing direction: {current_direction}")
+            o_position_array, stone_position_array = move_player_and_stone(o_position_array, stone_position_array, current_direction)
+            pygame.display.flip()
+            time_since_last_move = 0
         
     
     
