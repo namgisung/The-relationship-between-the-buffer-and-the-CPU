@@ -110,7 +110,9 @@ def remove_first_block():
         blocks.pop(0)
 
 def initialize_extra_blocks():
-    global extra_blocks
+    global extra_blocks, extra_map, current_stage_index
+    extra_map = stages[current_stage_index]
+    extra_blocks = []
     for row, line in enumerate(extra_map):
         for col, char in enumerate(line):
             if char == 'X':
@@ -134,6 +136,14 @@ def find_stone_position_in_array():
     for row, line in enumerate(extra_map):
         for col, char in enumerate(line):
             if char == '*':
+                return col, row
+    return None  # '*'를 찾지 못한 경우 None 반환
+
+def find_stop_position_in_array():
+    global extra_map
+    for row, line in enumerate(extra_map):
+        for col, char in enumerate(line):
+            if char == '-':
                 return col, row
     return None  # '*'를 찾지 못한 경우 None 반환
 
@@ -212,8 +222,18 @@ def draw_stone(stone_position):
     stone_s_position = (new_s_block_x, new_s_block_y)
     screen.blit(stone_image, stone_s_position)
 
-    
+def stop_stone(stone_position_array,stop_position):
+    if (
+        stone_position_array[0]  <= stop_position[0]  and
+        stone_position_array[1] == stop_position[1] 
+        ):
+        return True
 
+# 스테이지 전환 함수
+def switch_stage():
+    global current_stage_index
+    current_stage_index = (current_stage_index + 1) % len(stages)
+    initialize_extra_blocks()
 
 current_direction = None
 last_move_time = time.time()
@@ -221,31 +241,95 @@ last_move_time = time.time()
 # 추가된 블록을 위한 맵
 extra_map = [
     "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "X....X.....X...X.....X.--.X",
-    "X.**.....X.X.X...X.....--.X",
-    "X.**....X..X..XXX.X.......X",
-    "XXXXX...X.X..X....X..X.XX.X",
-    "X....X..X..X...XX.X..X....X",
-    "X.X.X...X...XXX...X..XXXXXX",
-    "X........XX.....XXX.......X",
-    "XX.......X.XXX.X..........X",
-    "X....XXXX.....X..X...X...XX",
-    "X...X.....XXX..X.....XX...X",
-    "XX...X...X...X..X.XXXX...XX",
-    "X..........X..X..X........X",
-    "X.......XXX.X.XX.X........X",
-    "XXXXXX..X.....XX..X...X.X.X",
-    "X....X..X.XXXX.X..X..XX...X",
-    "X........XXXXX....X.......X",
-    "XX.......X...XXXXX........X",
-    "X....XX.X..X.....X.X.X...XX",
-    "X....X.X..X.XXXX.X.X.XX...X",
-    "X...X...X........X....X...X",
-    "XX.......X.......XXXXX....X",
-    "X...........X.X..........XX",
-    "X............X............X",
-    "X..X.........X........X..OX",
+    "X......................--.X",
+    "X......................--.X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "XX........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X......................**.X",
+    "X......................**.X",
+    "X........................OX",
     "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
+]
+
+# 현재 스테이지 인덱스
+current_stage_index = 0
+
+# 여러 스테이지의 맵 데이터
+stages = [
+    [
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "X......................--.X",
+    "X......................--.X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "XX........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X......................**.X",
+    "X......................**.X",
+    "X........................OX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    ],
+    [
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "X......................--.X",
+    "X......................--.X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X.........................X",
+    "X......................**.X",
+    "X......................**.X",
+    "X........................OX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXX",        
+    ],
+    # 여러 스테이지 추가 가능
 ]
 
 # 초기화
@@ -257,18 +341,29 @@ o_position_array = find_o_position_in_array()
 if o_position_array is not None:
     print(f"2차원 배열에서 O의 위치: {o_position_array}")
     o_position = o_position_array
+    o_position_s = o_position_array
 
 o_image = pygame.image.load("blocks/o.png")
 o_rect = o_image.get_rect()
 
-# -의 위치 찾기 (2차원 배열에서)
+# *의 위치 찾기 (2차원 배열에서)
 stone_position_array = find_stone_position_in_array()
 if stone_position_array is not None:
-    print(f"2차원 배열에서 -의 위치: {stone_position_array}")
+    print(f"2차원 배열에서 *의 위치: {stone_position_array}")
     stone_position = stone_position_array
+    stone_position_s = stone_position_array
 
 stone_image = pygame.image.load("blocks/stone.png")
 stone_rect = stone_image.get_rect()
+
+# -의 위치 찾기 (2차원 배열에서)
+stop_position_array = find_stop_position_in_array()
+if stop_position_array is not None:
+    print(f"2차원 배열에서 -의 위치: {stop_position_array}")
+    stop_position = stop_position_array
+    stop_position_s = stop_position_array
+
+stop_image = pygame.image.load("blocks/stop.png")
 
 clock = pygame.time.Clock()
 frame_rate = 10  # 초당 프레임 수 설정
@@ -313,21 +408,36 @@ while True:
                 sys.exit()
             elif event.key == pygame.K_RETURN:
                 execute_moves = True
+                print("실행")
                 
-        if direction_stack.is_empty() and execute_moves:
-            execute_moves = False
-            print("A")
+    if direction_stack.is_empty() and execute_moves:
+        execute_moves = False
+        o_position_array = o_position_s
+        stone_position_array = stone_position_s
+        pygame.display.flip()
+        print("A")
 
-        if execute_moves  and time_since_last_move >= delay_time:
-            if not direction_stack.is_empty():
-                current_direction = direction_stack.pop_()
-                print(f"Executing direction: {current_direction}")
-                o_position_array, stone_position_array = move_player_and_stone(o_position_array, stone_position_array, current_direction)
-                pygame.display.flip()
-                time_since_last_move = 0
+
+    if execute_moves and time_since_last_move >= delay_time:
+        if not direction_stack.is_empty():
+            current_direction = direction_stack.pop_()
+            print(f"Executing direction: {current_direction}")
+            o_position_array, stone_position_array = move_player_and_stone(o_position_array, stone_position_array, current_direction)
+            pygame.display.flip()
+            time_since_last_move = 0
+            print(execute_moves)
+
+            # 스테이지 클리어 체크
+            if stop_stone(stone_position_array,stop_position_array):  # CLEAR_POSITION은 스테이지 클리어 조건에 맞는 위치
+                switch_stage()
+                # 초기화 함수 호출
+                initialize_extra_blocks()
             
-
-        time_since_last_move = 0  # 이동 후 시간 초기화
+   
+    if stop_stone(stone_position_array,stop_position_array):
+            print("도착")
+            pygame.quit()
+            sys.exit()     
             
         
     
@@ -355,6 +465,11 @@ while True:
     # 돌 이미지 그리기
     draw_stone(stone_position_array)
 
+    # 도착지점 이미지 그리기
+    new_block_x = stop_position_array[0] * (extra_block_size + block_spacing) + block_spacing
+    new_block_y = stop_position_array[1] * (extra_block_size + block_spacing) + block_spacing
+    stop_position = (new_block_x, new_block_y)
+    screen.blit(stop_image,stop_position)
 
     # 화면 업데이트
     pygame.display.flip()
