@@ -31,7 +31,10 @@ extra_block_size = 50
 extra_block_spacing = 5
 
 # 딜레이 시간 설정
-delay_time = 0.05   
+delay_time = 0.05  
+
+bgsound = pygame.mixer.Sound("blocks/pop.mp3")
+bgsound.set_volume(0.7)
 
 # 마지막으로 실행한 시간
 last_execution_time = time.time()
@@ -99,6 +102,27 @@ def create_block_map(image_path, block_list, position):
     rect.topleft = (new_block_x, new_block_y)
     block_list.append((rect, image))
 
+def create_block_map_floor(image_path, block_list, position):
+    global runner_top_left, blocks
+    image = pygame.image.load(image_path)
+    rect = image.get_rect()
+    new_block_x = position[0] * (extra_block_size + extra_block_spacing) + (extra_block_spacing/2)
+    new_block_y = position[1] * (extra_block_size + extra_block_spacing) + (extra_block_spacing/2)
+    rect.topleft = (new_block_x, new_block_y)
+    block_list.append((rect, image))
+
+
+def create_block_map_tree(image_path, block_list, position):
+    global runner_top_left, blocks
+    image = pygame.image.load(image_path)
+    rect = image.get_rect()
+    new_block_x = position[0] * (extra_block_size + extra_block_spacing) + extra_block_spacing + 9
+    new_block_y = position[1] * (extra_block_size + extra_block_spacing) + extra_block_spacing
+    rect.topleft = (new_block_x, new_block_y)
+    block_list.append((rect, image))
+
+
+
 def remove_last_block_with_direction():
     removed_direction = direction_stack.pop()
     if removed_direction:
@@ -148,7 +172,7 @@ def is_position_valid(position):
     # position이 맵 범위 내에 있는지 확인
     if 0 <= position[0] < len(extra_map[0]) and 0 <= position[1] < len(extra_map):
         # 해당 위치에 벽이 있는지 확인
-        return extra_map[position[1]][position[0]] != 'X'
+        return extra_map[position[1]][position[0]] != 'X' and extra_map[position[1]][position[0]] != 'F' and extra_map[position[1]][position[0]] != '<'
     return False
 
 def is_collision(player_position, stone_position):
@@ -201,6 +225,7 @@ def move_player_and_stone(player_position, stone_position, direction):
             stone_position = new_stone_position
             stone_position_array = new_stone_position
             print("충돌")
+            
 
     elif is_position_valid(new_player_position):
         player_position = new_player_position
@@ -251,12 +276,12 @@ stages = [
     "..................",
     "..................",
     "...........XXXXXXX",
-    "...........X.....X",
-    "...........X.**.XX",
-    "...........X.**..X",
-    "...........X...O.X",
-    "...........X...--X",
-    "...........X.X.--X",
+    "...........X,,,,,X",
+    "...........X,**,XX",
+    "...........X,**,,X",
+    "...........X,,,O,X",
+    "...........X,,,--X",
+    "...........X,X,--X",
     "...........XXXXXXX"
     ],
     [
@@ -264,15 +289,15 @@ stages = [
     "..................",
     "..................",
     "..........XXXXXXXX",
-    "..........X......X",
-    "..........X..**..X",
-    "..........X..**..X",
-    "..........X....OXX",
-    "..........X...X--X",
-    "..........XX...--X",
-    "..........X......X",
-    "..........X....X.X",
-    "..........X......X",
+    "..........X,,,,,,X",
+    "..........X,,**,,X",
+    "..........X,,**,,X",
+    "..........X,,,,OXX",
+    "..........X,,,F--X",
+    "..........XX,,,--X",
+    "..........X,,,,,,X",
+    "..........X,,,,<,X",
+    "..........X,,,,,,X",
     "..........XXXXXXXX"        
     ],
     [
@@ -280,16 +305,16 @@ stages = [
     "...................",
     "...................",
     "........XXXXXXXXXXX",
-    "........X.........X",
-    "........X......**.X",
-    "........X......**.X",
-    "........X...XXXXXXX",
-    "........X.........X",
-    "........X....O....X",
-    "........X.........X",
-    "........XXXXXXX...X",
-    "........X--.......X",
-    "........X--.......X",
+    "........X,,,,,,,,,X",
+    "........X,,,,,,**,X",
+    "........X,,,,,,**,X",
+    "........X,,,XXXXXXX",
+    "........X,,,,,,,,<X",
+    "........X,,,,O,,,,X",
+    "........X,,,,,,,,,X",
+    "........XXXXXXX,,,X",
+    "........X--,,,,,,,X",
+    "........X--,,,,,,FX",
     "........XXXXXXXXXXX"   
     ],
     [
@@ -297,13 +322,13 @@ stages = [
     "...................",
     "...................",
     ".........XXXXXXXXXX",
-    ".........X..XXX...X",
-    ".........X........X",
-    ".........X.XX.O...X",
-    ".........X..X.....X",
-    ".........X.**..X--X",
-    ".........X.**..X--X",
-    ".........X........X",
+    ".........X,,XFX,,,X",
+    ".........X,,,,,,,,X",
+    ".........X,X<,O,,,X",
+    ".........X,,X,,,,,X",
+    ".........X,**,,X--X",
+    ".........X,**,,X--X",
+    ".........X,,,,,,,,X",
     ".........XXXXXXXXXX"
     ],
     [
@@ -311,44 +336,156 @@ stages = [
     "...................",
     "...................",
     "........XXXXXXXXXXX",
-    "........X.....X..X.",
-    "........XX**.....X.",
-    "........XX**.....X.",
-    "........X....X....X",
-    "........X...X.X...X",
-    "........X..X.....XX",
-    "........X........OX",
-    "........X.........X",
-    "........X...X.XXXX.",
-    "........XX...X.....",
-    "........X--..X.....",
-    "........X--..X.....",
+    "........X,,,,,X,,X.",
+    "........XX**,,,,,X.",
+    "........XX**,,,,,X.",
+    "........X,,,,X,,,,X",
+    "........X,,,XFX,,,X",
+    "........X,,X,,,,,XX",
+    "........X,,,,,,,,OX",
+    "........X,,,,,,,,,X",
+    "........X,,,X<XXXX.",
+    "........XX,,,X.....",
+    "........X--,,X.....",
+    "........X--,,X.....",
     "........XXXXXX....."
     ],
     [
     "......X...X..XX.XXX.X",
-    "......XXXX.XX..X...X.",
-    "......X.--...**.....X",
-    "......X.--..O**.....X",
-    "......X.XXX.XX.XX...X",
-    ".......X...X..X....X.",
-    ".......X.......X...X.",
-    "......X.........X..XX",
-    "......X...X.X...X..X.",
-    "......X....X...X...X.",
-    "......XX...X....X..X.",
-    "......X...X.....X...X",
-    ".......X..X.X..X...X.",
-    "......X...X...X....X.",
-    "......X...XXXX.XX...X",
-    "......X.............X",
-    ".......X...........X.",
-    ".......X...X.X.X..XX.",
+    "......XXXX,XX,,X,,,X.",
+    "......X,--,,,**,,,,,X",
+    "......X,--,,O**,,,,,X",
+    "......X,XXX,XX,XX,,,X",
+    ".......XF,,X,,X<,,,X.",
+    ".......X,,,,,,,X,,,X.",
+    "......X,,,,,,,,,X,,XX",
+    "......X,,,X,X,,,X,,X.",
+    "......X,,,,X,,,XF,,X.",
+    "......XX,,,X,,,,X,,X.",
+    "......X,,,X,,,,,X,,,X",
+    ".......X,,X,<,,X,,,X.",
+    "......X,,,X,,,X,,,,X.",
+    "......X,,,XXXX,XX,,,X",
+    "......X,,,,,,,,,,,,,X",
+    ".......X,,,,,,,,,,,X.",
+    ".......X,,,X,X<X,,XX.",
     "......X.XXX.X.X.XX..X",
+    ],
+    [
+    "......................",
+    "......................",
+    "......................",
+    "......X.XXX...XXXX.XXX",
+    ".....X,X,,,XXX,,,,X,<X",
+    ".....X,,,X,,X,,X,,XF,X",
+    ".....X,XX,,X,,X,,X,,,X",
+    ".....X,,X,,,,X,,X,,,,X",
+    ".....XX,,X,,,,,,,,,,,X",
+    ".....X,X,X,,,,,,,,,X,X",
+    ".....X,,,,,,XO,,X,,X,X",
+    ".....X,,X,**,XX,X,,X,X",
+    "......X,X,**,FX,,,,,,X",
+    ".....X,,X,XX,X,,X--XXX",
+    "......X,,,,X,,,X,--X..",
+    ".....X.XXXX.XXX.XXXX..",
     ]
 ]
 
+stage1 = pygame.image.load("blocks/stage1.png")
+stage2 = pygame.image.load("blocks/stage2.png")
+stage3 = pygame.image.load("blocks/stage3.png")
+stage4 = pygame.image.load("blocks/stage4.png")
+stage5 = pygame.image.load("blocks/stage5.png")
+stage6 = pygame.image.load("blocks/stage6.png")
+stage7 = pygame.image.load("blocks/stage7.png")
+reset = pygame.image.load("blocks/reset.png")
+def switch_stage1():
+    global current_stage_index
+    direction_stack.clear()
+    while len(blocks) != 0:
+        remove_last_block()
+    current_stage_index = 0
+    initialize_extra_blocks()
 
+def switch_stage2():
+    global current_stage_index
+    direction_stack.clear()
+    while len(blocks) != 0:
+        remove_last_block()
+    current_stage_index = 1
+    initialize_extra_blocks()
+
+def switch_stage3():
+    global current_stage_index
+    direction_stack.clear()
+    while len(blocks) != 0:
+        remove_last_block()
+    current_stage_index = 2
+    initialize_extra_blocks()
+
+def switch_stage4():
+    global current_stage_index
+    direction_stack.clear()
+    while len(blocks) != 0:
+        remove_last_block()
+    current_stage_index = 3
+    initialize_extra_blocks()
+
+def switch_stage5():
+    global current_stage_index
+    direction_stack.clear()
+    while len(blocks) != 0:
+        remove_last_block()
+    current_stage_index = 4
+    initialize_extra_blocks()
+
+def switch_stage6():
+    global current_stage_index
+    direction_stack.clear()
+    while len(blocks) != 0:
+        remove_last_block()
+    current_stage_index = 5
+    initialize_extra_blocks()
+
+def switch_stage7():
+    global current_stage_index
+    direction_stack.clear()
+    while len(blocks) != 0:
+        remove_last_block()
+    current_stage_index = 6
+    initialize_extra_blocks()
+
+def reset_l():
+    direction_stack.clear()
+    while len(blocks) != 0:
+        remove_last_block()
+
+class Button:
+    def __init__(self, x, y, image, action=None):
+        self.image = pygame.image.load(image)
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x,y)
+        
+        self.action = action
+
+    def draw(self):
+        
+        screen.blit(self.image, (self.rect.x,self.rect.y))
+
+    def check_click(self, mouse_pos):
+        
+        if self.rect.collidepoint(mouse_pos):
+            if self.action:
+                self.action()
+                
+reset_but = Button(runner_top_left[0] - 110,runner_top_left[1],"blocks/reset.png",reset_l)
+stage1_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 50,"blocks/stage1.png",switch_stage1)        
+stage2_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 100,"blocks/stage2.png",switch_stage2)
+stage3_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 150,"blocks/stage3.png",switch_stage3)
+stage4_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 200,"blocks/stage4.png",switch_stage4)
+stage5_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 250,"blocks/stage5.png",switch_stage5)
+stage6_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 300,"blocks/stage6.png",switch_stage6)
+stage7_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 350,"blocks/stage7.png",switch_stage7)
 def o_find():
     global o_position_array, o_position, o_image
     # O의 위치 찾기 (2차원 배열에서)
@@ -359,9 +496,10 @@ def o_find():
         o_position = o_position_array
         o_position_s = o_position_array
 
-        o_image = pygame.image.load("blocks/o.png")
+        o_image = pygame.image.load("blocks/o2.png")
         o_rect = o_image.get_rect()
         return o_position, o_position_s
+
 
 def stone_find():
     global stone_position_array, stone_position, stone_image
@@ -395,7 +533,19 @@ def initialize_extra_blocks():
     for row, line in enumerate(extra_map):
         for col, char in enumerate(line):
             if char == 'X':
+                create_block_map_floor("blocks/s.png", extra_blocks, (col, row))
                 create_block_map("blocks/extra_block.png", extra_blocks, (col, row))
+
+            elif char == '<':
+                create_block_map_floor("blocks/floor.png", extra_blocks, (col, row))
+                create_block_map_tree("blocks/tree.png", extra_blocks, (col, row))
+
+            elif char == 'F':
+                create_block_map_floor("blocks/floor.png", extra_blocks, (col, row))
+                create_block_map("blocks/fire.png", extra_blocks, (col, row))
+            elif char != '.':
+                create_block_map_floor("blocks/floor.png", extra_blocks, (col, row))
+
 
     o_position, o_position_s = o_find()
     stone_position, stone_position_s = stone_find()
@@ -450,7 +600,18 @@ while True:
             elif event.key == pygame.K_RETURN:
                 execute_moves = True
                 print("실행")
-                
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            stage1_but.check_click(mouse_pos) 
+            stage2_but.check_click(mouse_pos)
+            stage3_but.check_click(mouse_pos) 
+            stage4_but.check_click(mouse_pos) 
+            stage5_but.check_click(mouse_pos) 
+            stage6_but.check_click(mouse_pos) 
+            stage7_but.check_click(mouse_pos)
+            reset_but.check_click(mouse_pos)       
+            print("yes")
     if direction_stack.is_empty() and execute_moves:
         execute_moves = False
         o_position_array = o_position_s
@@ -497,6 +658,14 @@ while True:
     # 실행기 그리기
     pygame.draw.rect(screen, runner_color, runner_rect)
 
+    stage1_but.draw()
+    stage2_but.draw()
+    stage3_but.draw()
+    stage4_but.draw()
+    stage5_but.draw()
+    stage6_but.draw()
+    stage7_but.draw()
+    reset_but.draw()
     # 블록 그리기
     for block in blocks:
         screen.blit(block[1], block[0])
