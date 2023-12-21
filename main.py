@@ -391,6 +391,8 @@ stages = [
     ]
 ]
 
+count_started = False
+
 stage1 = pygame.image.load("blocks/stage1.png")
 stage2 = pygame.image.load("blocks/stage2.png")
 stage3 = pygame.image.load("blocks/stage3.png")
@@ -399,6 +401,7 @@ stage5 = pygame.image.load("blocks/stage5.png")
 stage6 = pygame.image.load("blocks/stage6.png")
 stage7 = pygame.image.load("blocks/stage7.png")
 reset = pygame.image.load("blocks/reset.png")
+quest1 = pygame.image.load("blocks/quest1.png")
 def switch_stage1():
     global current_stage_index
     direction_stack.clear()
@@ -460,6 +463,14 @@ def reset_l():
     while len(blocks) != 0:
         remove_last_block()
 
+# quest1_action 함수 수정
+def quest1_action():
+    global count, count_started, success_stages
+    count = 0  # 카운트 초기화
+    count_started = True  # 카운트 시작 상태로 변경
+    success_stages.clear()  # 성공한 스테이지 목록 비우기
+    print("퀘스트 1 시작!")
+
 class Button:
     def __init__(self, x, y, image, action=None):
         self.image = pygame.image.load(image)
@@ -486,6 +497,7 @@ stage4_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 200,"blocks/st
 stage5_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 250,"blocks/stage5.png",switch_stage5)
 stage6_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 300,"blocks/stage6.png",switch_stage6)
 stage7_but = Button(runner_top_left[0] - 110,runner_top_left[1] + 350,"blocks/stage7.png",switch_stage7)
+quest1_but = Button(runner_top_left[0] - 110, runner_top_left[1] + 400, "blocks/quest1.png", quest1_action)
 def o_find():
     global o_position_array, o_position, o_image
     # O의 위치 찾기 (2차원 배열에서)
@@ -563,6 +575,8 @@ execute_moves = False
 move_interval = 0.05
 time_since_last_move =0
 
+success_stages = set()
+success_stages2 = set()
 while True:
     dt = clock.tick(60) / 1000.0
     time_since_last_move += dt
@@ -610,7 +624,8 @@ while True:
             stage5_but.check_click(mouse_pos) 
             stage6_but.check_click(mouse_pos) 
             stage7_but.check_click(mouse_pos)
-            reset_but.check_click(mouse_pos)       
+            reset_but.check_click(mouse_pos)
+            quest1_but.check_click(mouse_pos)       
             print("yes")
     if direction_stack.is_empty() and execute_moves:
         execute_moves = False
@@ -632,7 +647,7 @@ while True:
             stop_position_array = find_stop_position_in_array()
 
             # 스테이지 클리어 체크
-            if stop_stone(stone_position_array,stop_position_array):  # CLEAR_POSITION은 스테이지 클리어 조건에 맞는 위치
+            if stone_position_array == stop_position_array:  # CLEAR_POSITION은 스테이지 클리어 조건에 맞는 위치
                 execute_moves = False
                 print("성공")
                 text1 = font1.render('collision_num : {}'.format(stages), True, (255, 255, 255))
@@ -641,14 +656,23 @@ while True:
                 switch_stage()
                 # 초기화 함수 호출
                 initialize_extra_blocks()
+
+                if current_stage_index in [5, 6, 7]:
+                    success_stages2.add(current_stage_index)
+                    print(success_stages2)
+                    success_stages2.clear()
+
+                if count_started:
+                    # 성공한 스테이지 목록 출력 후 리스트 비우기
+                    if current_stage_index in [1, 2, 3, 4]:
+                        success_stages.add(current_stage_index)
+                        print(success_stages)
+
+                    if len(success_stages) >= 2:
+                        print(f"2개 이상의 스테이지 성공! 성공한 스테이지: {success_stages}")
+                        success_stages.clear()
+                        count_started = False
                 
-            
-   
-        
-            
-        
-    
-    
 
     # 화면을 흰색으로 지우기
     screen.fill(bg_color)
@@ -666,6 +690,7 @@ while True:
     stage6_but.draw()
     stage7_but.draw()
     reset_but.draw()
+    quest1_but.draw()
     # 블록 그리기
     for block in blocks:
         screen.blit(block[1], block[0])
