@@ -10,3 +10,8 @@ Backspace: Delete the entered command
 
 Enter key: Execute the entered command
 
+
+
+
+
+![스크린샷(97)](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/75d9417c-df94-45f3-90a9-b4e1c947b150)
