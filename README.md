@@ -10,10 +10,10 @@ Backspace: Delete the entered command
 
 Enter key: Execute the entered command
 
-![스크린샷(91)](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/716b4bfc-bca6-42df-a064-8c74c183e218)
-![스크린샷(92)](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/31b44360-b062-48be-8a6a-9b185670d219)
-![스크린샷(93)](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/acb2e16f-bc8b-419e-a171-b8bf5178006b)
-![스크린샷(94)](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/4058a110-e7c7-4ba1-9d98-229138a25592)
-![스크린샷(95)](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/63384507-f28e-4df7-892a-ba220b6ffc38)
-![스크린샷(96)](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/950a41c1-ac8e-420d-9bb4-c51638ef6f1e)
-![스크린샷(97)](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/75d9417c-df94-45f3-90a9-b4e1c947b150)
+![KakaoTalk_20240502_142550697](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/e157e67e-1e74-4db7-b953-36fbabfc74a2)
+![KakaoTalk_20240502_142550697_01](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/057cada3-f9e6-489d-9741-40fa3f154b72)
+![KakaoTalk_20240502_142550697_02](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/b07a0725-70ad-45f0-b611-137acf132525)
+![KakaoTalk_20240502_142550697_03](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/e7341a10-fe56-42df-bcfb-e420aeaada00)
+![KakaoTalk_20240502_142550697_04](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/c5923fa9-d401-4294-beed-cfd4606bd8ff)
+![KakaoTalk_20240502_142550697_05](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/99920e3f-6250-43a9-87b7-1b2e85675c43)
+![KakaoTalk_20240502_142550697_06](https://github.com/namgisung/The-relationship-between-the-buffer-and-the-CPU/assets/109130108/e71894da-62f3-46fb-84bc-3cc4a947de2b)
